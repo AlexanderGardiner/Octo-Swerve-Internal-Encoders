@@ -97,7 +97,7 @@ public class SwerveModule {
         //this.steeringMotor.getEncoder().setPosition((1/GEARING_TURN_MOTORS) * (rioEncoder.getAbsolutePosition()+zeroTicks));
 ;
         // Drive Motor
-        this.driveMotor = new WPI_TalonFX(driveMotorChannel, MotorIDs.CANFD_NAME);
+        this.driveMotor = new WPI_TalonFX(driveMotorChannel);
         MotorUtil.setupMotionMagic(FeedbackDevice.IntegratedSensor, DM_MM_PID, DM_MM_CONFIG, driveMotor);
         driveMotor.configAllowableClosedloopError(0, 5);
         driveMotor.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
