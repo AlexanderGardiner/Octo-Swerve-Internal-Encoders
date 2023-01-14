@@ -92,6 +92,7 @@ public class SwerveModule {
         this.steeringMotor.restoreFactoryDefaults();
         SparkMaxEncoderType steeringMotorEncoderType = SparkMaxEncoderType.relative;
         MotorUtil.setupSmartMotion(steeringMotorEncoderType, TM_SM_PID, TM_SM_CONFIG ,ENCODER_RESOLUTION, steeringMotor);
+        steeringMotor.getEncoder().setPosition(zeroTicks);
         // Initialize position of steering motor encoder to the same as the rio encoder
         //this.steeringMotor.getEncoder().setPosition((1/GEARING_TURN_MOTORS) * (rioEncoder.getAbsolutePosition()+zeroTicks));
 ;
