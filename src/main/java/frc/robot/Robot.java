@@ -1,5 +1,5 @@
 /*
- * This file is part of OctoSwerve-Revamp, licensed under the GNU General Public License (GPLv3).
+ * This file is part of Placeholder-2023, licensed under the GNU General Public License (GPLv3).
  *
  * Copyright (c) Octobots <https://github.com/Octobots9084>
  * Copyright (c) contributors
@@ -52,6 +52,7 @@ public class Robot extends TimedRobot {
     public void robotInit() {
         initializeAllSubsystems();
         initializeDefaultCommands();
+        Gyro.getInstance().resetGyro();
 
         var drive = Shuffleboard.getTab("Drive");
         drive.add(field2d)
@@ -113,6 +114,7 @@ public class Robot extends TimedRobot {
     }
 
     private void resetRobotPoseAndGyro() {
+        Gyro.getInstance().resetGyro();
         DriveTrain.getInstance().drive(0, 0, 0, true);
     }
 

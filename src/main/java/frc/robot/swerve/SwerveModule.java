@@ -1,5 +1,5 @@
 /*
- * This file is part of OctoSwerve-Revamp, licensed under the GNU General Public License (GPLv3).
+ * This file is part of Placeholder-2023, licensed under the GNU General Public License (GPLv3).
  *
  * Copyright (c) Octobots <https://github.com/Octobots9084>
  * Copyright (c) contributors
@@ -29,9 +29,9 @@ import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.SparkMaxAlternateEncoder;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+// import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import frc.robot.MotorIDs;
 import frc.robot.util.*;
 
@@ -41,11 +41,11 @@ import java.util.concurrent.atomic.AtomicReference;
 public class SwerveModule {
     // Physical Constants
     private static final double WHEEL_RADIUS = 0.03915;
-    private static final int ENCODER_RESOLUTION = 4096;
+    private static final int ENCODER_RESOLUTION = 1;
     private static final double GEARING = 11.0 / 40.0;
     private static final double GEARING_TURN_MOTORS = 1.0 / 20.0;
-    private static final double DRIVE_MOTOR_TICK_TO_SPEED = 10 * GEARING * (2 * Math.PI * WHEEL_RADIUS) / 2048; // m/s
     private static final double STEER_MOTOR_TICK_TO_ANGLE = 2 * Math.PI / ENCODER_RESOLUTION / GEARING_TURN_MOTORS; // radians
+    private static final double DRIVE_MOTOR_TICK_TO_SPEED = 10 * GEARING * (2 * Math.PI * WHEEL_RADIUS) / 2048; // m/s
     // Controller Constants
     private static final double MAX_TURN_ACCELERATION = 20000; // Rad/s
     private static final double MAX_TURN_VELOCITY = 20000; // Rad/s
@@ -69,8 +69,6 @@ public class SwerveModule {
     );
     private static final PIDConfig DM_MM_PID = new PIDConfig(0.035, 0.0001, 0, 0.06);
 
-    private final double zeroTicks;
-
     // Motors
     private final WPI_TalonFX driveMotor;
     private final CANSparkMax steeringMotor;
@@ -86,17 +84,17 @@ public class SwerveModule {
      * @param steeringMotorChannel ID for the turning motor.
      * @param zeroTicks            ticks when angle = 0
      */
-    public SwerveModule(int driveMotorChannel, int steeringMotorChannel, double zeroTicks) {
-        this.zeroTicks = zeroTicks;
+    public SwerveModule(int driveMotorChannel, int steeringMotorChannel, double zeroTicks) { //, DutyCycleEncoder rioEncoder) {
 
         // Steer Motor
         this.steeringMotor = new CANSparkMax(steeringMotorChannel, CANSparkMaxLowLevel.MotorType.kBrushless);
         TM_SM_PID.setTolerance(0);
         this.steeringMotor.restoreFactoryDefaults();
         SparkMaxEncoderType steeringMotorEncoderType = SparkMaxEncoderType.relative;
-        MotorUtil.setupSmartMotion(steeringMotorEncoderType, TM_SM_PID, TM_SM_CONFIG, SparkMaxAlternateEncoder.Type.kQuadrature,ENCODER_RESOLUTION, steeringMotor);
-
-
+        MotorUtil.setupSmartMotion(steeringMotorEncoderType, TM_SM_PID, TM_SM_CONFIG ,ENCODER_RESOLUTION, steeringMotor);
+        // Initialize position of steering motor encoder to the same as the rio encoder
+        //this.steeringMotor.getEncoder().setPosition((1/GEARING_TURN_MOTORS) * (rioEncoder.getAbsolutePosition()+zeroTicks));
+;
         // Drive Motor
         this.driveMotor = new WPI_TalonFX(driveMotorChannel, MotorIDs.CANFD_NAME);
         MotorUtil.setupMotionMagic(FeedbackDevice.IntegratedSensor, DM_MM_PID, DM_MM_CONFIG, driveMotor);
@@ -129,7 +127,7 @@ public class SwerveModule {
     }
 
     public double convertAngleToTick(double angleInRads) {
-        return (angleInRads / STEER_MOTOR_TICK_TO_ANGLE) + zeroTicks;
+        return (angleInRads / STEER_MOTOR_TICK_TO_ANGLE);
     }
 
     public double convertVelocityToTicksPer100ms(double velocity) {
@@ -161,7 +159,7 @@ public class SwerveModule {
     }
 
     public void updateSwerveInformation() {
-        swerveAngle.set((steeringMotor.getEncoder().getPosition() - zeroTicks) * STEER_MOTOR_TICK_TO_ANGLE);
+        swerveAngle.set((steeringMotor.getEncoder().getPosition()) * STEER_MOTOR_TICK_TO_ANGLE);
         swerveSpeed.set(driveMotor.getSensorCollection().getIntegratedSensorVelocity() * DRIVE_MOTOR_TICK_TO_SPEED);
     }
 
